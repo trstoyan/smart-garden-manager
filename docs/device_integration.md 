@@ -1,0 +1,126 @@
+# 🌿 Smart Device Integration Guide (ESP32 / Raspberry Pi)
+
+This guide explains how to integrate smart devices such as ESP32 and Raspberry Pi into the Smart Garden Manager platform for collecting sensor data and performing automated actions like watering and lighting.
+
+---
+
+## 🧰 Supported Devices
+
+* **ESP32 / ESP8266** (recommended for Wi-Fi-enabled sensor nodes)
+* **Raspberry Pi** (for more complex automations or local hubs)
+
+---
+
+## 🛰️ Features Enabled via Devices
+
+* Temperature and humidity monitoring
+* Soil moisture level tracking
+* Light level readings
+* Automatic watering via pump/relay
+* Grow light automation
+* Ventilation control for greenhouse
+
+---
+
+## 🏗️ Architecture
+
+* Devices send data via **HTTP POST** or **MQTT** to the Django backend.
+* Each device is registered and assigned to a **Garden** or **Zone**.
+* The backend stores data and can trigger automations based on care rules.
+
+---
+
+## ⚙️ ESP32 Setup Example
+
+### 1. Install PlatformIO or Arduino IDE
+
+### 2. Example Arduino Code (HTTP POST):
+
+```cpp
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
+const char* serverUrl = "http://your-server.com/api/sensor-data/";
+
+void setup() {
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) delay(1000);
+}
+
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+    int soil = analogRead(34); // Example pin
+
+    String payload = "{\"device_id\": \"ESP32_001\", \"soil_moisture\": " + String(soil) + "}";
+    http.POST(payload);
+    http.end();
+  }
+  delay(60000); // 1-minute interval
+}
+```
+
+---
+
+## 🐍 Django API Endpoint
+
+### POST `/api/sensor-data/`
+
+Payload:
+
+```json
+{
+  "device_id": "ESP32_001",
+  "temperature": 22.4,
+  "humidity": 50.1,
+  "soil_moisture": 680,
+  "light": 200
+}
+```
+
+Backend stores readings and logs them for dashboard and rule analysis.
+
+---
+
+## 🔁 Automation Examples
+
+* Water if `soil_moisture < 600`
+* Activate grow light if `light < 150` and time is between 6am–8pm
+* Trigger ventilation if `humidity > 80%`
+
+---
+
+## 🧪 Testing and Debugging
+
+* Use Postman or cURL to simulate data payloads
+* Use logs to confirm automations are triggered correctly
+
+---
+
+## 🔐 Security
+
+* Use API keys per device
+* Rate limit and validate all data
+* Optionally use HTTPS or MQTT with encryption
+
+---
+
+## 📡 Optional MQTT Integration
+
+Support for MQTT brokers (like Mosquitto) will be added to enable lightweight and scalable message passing for IoT devices.
+
+---
+
+## 📘 Coming Soon
+
+* Web UI to manage devices, view logs, and configure triggers
+* OTA updates for ESP devices
+* Alert triggers for extreme values
+
+---
+
+For full backend setup, see the main README or `/api/devices/` documentation.
