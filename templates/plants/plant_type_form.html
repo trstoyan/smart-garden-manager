@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">{% if plant_type %}Edit Plant Type{% else %}Create Plant Type{% endif %}</h1>
+      <p class="page-subtitle">Plant types store baseline care defaults for similar plants.</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'plants:setup_center' %}">Back to Setup</a>
+  </div>
+
+  <section class="surface">
+    <div class="surface-body">
+      <form method="post">
+        {% csrf_token %}
+        {% include 'plants/_field_blocks.html' %}
+        <button class="btn btn-success" type="submit">{% if plant_type %}Save Plant Type{% else %}Create Plant Type{% endif %}</button>
+      </form>
+
+      {% if plant_type %}
+      <hr>
+      <form method="post" action="{% url 'plants:plant_type_delete' plant_type.id %}" onsubmit="return confirm('Delete this plant type?');">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger" type="submit">Delete Plant Type</button>
+      </form>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

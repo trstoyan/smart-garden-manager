@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Care Calendar</h1>
+      <p class="page-subtitle">Plan and complete watering, fertilizing, and repotting tasks.</p>
+    </div>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Planner Settings</div>
+    <div class="surface-body">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-sm-4 col-md-3">
+          <label for="days" class="form-label">Planning Days</label>
+          <input id="days" class="form-control" type="number" name="days" min="1" max="60" value="{{ horizon_days }}">
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <label for="daily_limit" class="form-label">Daily Capacity</label>
+          <input id="daily_limit" class="form-control" type="number" name="daily_limit" min="1" max="30" value="{{ daily_limit }}">
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <label for="optimize" class="form-label">Load Balancing</label>
+          <div class="form-check">
+            <input id="optimize" class="form-check-input" type="checkbox" name="optimize" value="1" {% if optimize %}checked{% endif %}>
+            <label class="form-check-label" for="optimize">Spread tasks automatically</label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-success w-100" type="submit">Recalculate Plan</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  {% for day, tasks in days %}
+  <section class="surface mb-3">
+    <div class="surface-header d-flex justify-content-between align-items-center">
+      <strong>{{ day }}</strong>
+      <span class="status-pill {% if tasks|length > daily_limit %}warn{% else %}good{% endif %}">
+        {{ tasks|length }} task{{ tasks|length|pluralize }}
+      </span>
+    </div>
+    <div class="surface-body">
+      {% if tasks %}
+      <ul class="mb-0 list-lines">
+        {% for task in tasks %}
+        <li>
+          <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
+            <div>
+              <a href="{% url 'plants:plant_detail' task.plant_id %}">{{ task.plant_name }}</a>
+              <span class="text-muted">({{ task.garden_name }})</span>
+              <span class="badge bg-light text-dark border">{{ task.event_type|title }}</span>
+              {% if task.is_overdue %}
+              <span class="badge bg-danger">Overdue by {{ task.days_overdue }} day{{ task.days_overdue|pluralize }}</span>
+              {% endif %}
+              {% if task.adjustment_reason %}
+              <span class="badge bg-info text-dark">{{ task.adjustment_reason }}</span>
+              {% endif %}
+            </div>
+            <form method="post" action="{% url 'plants:complete_task' %}">
+              {% csrf_token %}
+              <input type="hidden" name="plant_id" value="{{ task.plant_id }}">
+              <input type="hidden" name="event_type" value="{{ task.event_type }}">
+              <input type="hidden" name="scheduled_date" value="{{ day|date:'Y-m-d' }}">
+              <input type="hidden" name="days" value="{{ horizon_days }}">
+              <input type="hidden" name="daily_limit" value="{{ daily_limit }}">
+              <input type="hidden" name="optimize" value="{% if optimize %}1{% else %}0{% endif %}">
+              <button type="submit" class="btn btn-sm btn-outline-success">Mark Done</button>
+            </form>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="mb-0 text-muted">No tasks scheduled for this day.</p>
+      {% endif %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

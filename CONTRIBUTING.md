@@ -27,6 +27,7 @@ Thank you for your interest in contributing to **Smart Garden Manager**! This gu
 5. **Run initial migrations**:
 
    ```bash
+   cd smart_garden
    python manage.py migrate
    ```
 6. **Run the development server**:
@@ -39,11 +40,10 @@ Thank you for your interest in contributing to **Smart Garden Manager**! This gu
 
 ## 📦 Project Structure
 
-* `plants/` — Django app for plant models and scheduling logic
-* `devices/` — Future module for device integration (ESP32, Raspberry Pi)
-* `core/` — Core models for gardens, notifications, and calendar tasks
-* `api/` — Django REST API endpoints
-* `frontend/` — (Planned) front-end code for UI/dashboard
+* `smart_garden/` — Django project root (`manage.py`, settings, app modules)
+* `smart_garden/plants/` — Plant models, scheduling logic, tests, and views
+* `templates/` — Shared templates used by dashboard and calendar pages
+* `docs/` — Supporting documentation (device integration and guides)
 
 ---
 
@@ -89,7 +89,16 @@ Thank you for your interest in contributing to **Smart Garden Manager**! This gu
 Use Django's built-in testing tools or `pytest-django`.
 
 ```bash
+cd smart_garden
 python manage.py test
+```
+
+Manual workflow checks can also be run with:
+
+```bash
+python manage.py evaluate_automations
+python manage.py process_device_actions --batch-size 100 --max-attempts 6
+python manage.py process_notifications --batch-size 100 --max-attempts 6
 ```
 
 You may add tests under `plants/tests/`, `core/tests/`, or relevant submodules.
@@ -98,7 +107,8 @@ You may add tests under `plants/tests/`, `core/tests/`, or relevant submodules.
 
 ## 🤖 CI/CD (Coming Soon)
 
-* GitHub Actions for linting, tests, and Docker build
+* GitHub Actions is configured in `.github/workflows/ci.yml` for migration checks, Django checks, and tests
+* Future additions: linting, Docker build, and release automation
 * Optional device emulation tests (future)
 
 ---

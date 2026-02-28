@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Edit Device</h1>
+      <p class="page-subtitle">Update device details, rotate API key, and review recent telemetry/actions.</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'plants:devices_center' %}">Back to Devices</a>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Device Details</div>
+    <div class="surface-body">
+      <form method="post">
+        {% csrf_token %}
+        {% include 'plants/_field_blocks.html' %}
+        <button class="btn btn-success" type="submit">Save Device</button>
+      </form>
+
+      <hr>
+      <p class="mb-1"><strong>API Key</strong></p>
+      <code>{{ device.api_key }}</code>
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <form method="post" action="{% url 'plants:device_rotate_key' device.id %}">
+          {% csrf_token %}
+          <button class="btn btn-outline-dark btn-sm" type="submit">Rotate API Key</button>
+        </form>
+        <form method="post" action="{% url 'plants:device_delete' device.id %}" onsubmit="return confirm('Delete this device?');">
+          {% csrf_token %}
+          <button class="btn btn-outline-danger btn-sm" type="submit">Delete Device</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <section class="surface h-100">
+        <div class="surface-header">Recent Sensor Readings</div>
+        <div class="surface-body">
+          {% if recent_readings %}
+          <ul class="list-lines">
+            {% for reading in recent_readings %}
+            <li>{{ reading.timestamp }} · T={{ reading.temperature|default:"-" }} H={{ reading.humidity|default:"-" }} M={{ reading.soil_moisture|default:"-" }} L={{ reading.light|default:"-" }}</li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-muted mb-0">No readings yet.</p>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-6">
+      <section class="surface h-100">
+        <div class="surface-header">Recent Device Actions</div>
+        <div class="surface-body">
+          {% if recent_actions %}
+          <ul class="list-lines">
+            {% for action in recent_actions %}
+            <li>#{{ action.id }} {{ action.action_type }} · {{ action.status }} ({{ action.created_at }})</li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-muted mb-0">No actions yet.</p>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

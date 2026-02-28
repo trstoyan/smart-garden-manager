@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Setup Center</h1>
+      <p class="page-subtitle">Create your garden structure here: gardens, plant types, groups, plants, and devices.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-success btn-sm" href="{% url 'plants:onboarding_wizard' %}">Guided Start</a>
+      <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:dashboard' %}">Plant List</a>
+    </div>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Setup Progress</div>
+    <div class="surface-body">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong>{{ setup_completed_steps }} / {{ setup_total_steps }} steps completed</strong>
+        <span class="text-muted small">Goal: at least 1 item in each category</span>
+      </div>
+      <div class="progress mb-3" role="progressbar" aria-label="Setup completion" aria-valuenow="{{ setup_completed_steps }}" aria-valuemin="0" aria-valuemax="{{ setup_total_steps }}">
+        <div class="progress-bar bg-success" style="width: {% widthratio setup_completed_steps setup_total_steps 100 %}%"></div>
+      </div>
+
+      <div class="metric-grid mb-2">
+        <div class="metric-card"><div class="metric-label">Gardens</div><div class="metric-value">{{ setup_progress.gardens }}</div></div>
+        <div class="metric-card"><div class="metric-label">Plant Types</div><div class="metric-value">{{ setup_progress.plant_types }}</div></div>
+        <div class="metric-card"><div class="metric-label">Groups</div><div class="metric-value">{{ setup_progress.plant_groups }}</div></div>
+        <div class="metric-card"><div class="metric-label">Plants</div><div class="metric-value">{{ setup_progress.plants }}</div></div>
+        <div class="metric-card"><div class="metric-label">Devices</div><div class="metric-value">{{ setup_progress.devices }}</div></div>
+      </div>
+
+      {% if setup_completed_steps < setup_total_steps %}
+      <div class="note-strip">Need help finishing setup? Use <a href="{% url 'plants:onboarding_wizard' %}">Guided Start</a> for a step-by-step flow.</div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Starter Packs</div>
+    <div class="surface-body">
+      <p class="page-subtitle mb-3">One click creates a sample garden with type, group, and first plant.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <form method="post" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="starter_pack" value="balcony_herbs">
+          <button class="btn btn-outline-success" type="submit">Balcony Herbs Pack</button>
+        </form>
+        <form method="post" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="starter_pack" value="indoor_houseplants">
+          <button class="btn btn-outline-success" type="submit">Indoor Houseplants Pack</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <section class="surface h-100">
+        <div class="surface-header d-flex justify-content-between align-items-center">
+          <span>Gardens</span>
+          <a class="btn btn-sm btn-success" href="{% url 'plants:garden_create' %}">Add</a>
+        </div>
+        <div class="surface-body">
+          {% if gardens %}
+          <ul class="list-lines">
+            {% for garden in gardens %}
+            <li><a href="{% url 'plants:garden_detail' garden.id %}">{{ garden.name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="empty-state">
+            <h5>No gardens yet</h5>
+            <p class="mb-0">Create at least one garden to start grouping plants.</p>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-4">
+      <section class="surface h-100">
+        <div class="surface-header d-flex justify-content-between align-items-center">
+          <span>Plant Types</span>
+          <a class="btn btn-sm btn-success" href="{% url 'plants:plant_type_create' %}">Add</a>
+        </div>
+        <div class="surface-body">
+          {% if plant_types %}
+          <ul class="list-lines">
+            {% for plant_type in plant_types %}
+            <li><a href="{% url 'plants:plant_type_detail' plant_type.id %}">{{ plant_type.name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="empty-state">
+            <h5>No plant types yet</h5>
+            <p class="mb-0">Plant types store default care intervals and moisture preferences.</p>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-4">
+      <section class="surface h-100">
+        <div class="surface-header d-flex justify-content-between align-items-center">
+          <span>Plant Groups</span>
+          <a class="btn btn-sm btn-success" href="{% url 'plants:plant_group_create' %}">Add</a>
+        </div>
+        <div class="surface-body">
+          {% if plant_groups %}
+          <ul class="list-lines">
+            {% for group in plant_groups %}
+            <li>
+              <a href="{% url 'plants:plant_group_detail' group.id %}">{{ group.name }}</a>
+              <div class="small text-muted">{{ group.garden.name }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="empty-state">
+            <h5>No groups yet</h5>
+            <p class="mb-0">Groups let you apply common care logic to similar plants.</p>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <p class="helper-links">
+    Next steps: <a href="{% url 'plants:devices_center' %}">Devices</a> ·
+    <a href="{% url 'plants:sensor_readings_center' %}">Sensor Readings</a> ·
+    <a href="{% url 'plants:notifications_center' %}">Alerts</a>
+  </p>
+</div>
+{% endblock %}

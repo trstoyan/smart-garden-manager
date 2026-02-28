@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -66,7 +68,10 @@ ROOT_URLCONF = 'smart_garden.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',
+            BASE_DIR.parent / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -142,9 +147,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATICFILES_DIRS = []
+for static_dir in (BASE_DIR / 'static', BASE_DIR.parent / 'static'):
+    if static_dir.exists():
+        STATICFILES_DIRS.append(static_dir)
 
 # Media files
 MEDIA_URL = '/media/'
@@ -220,3 +226,37 @@ LOGGING = {
 
 # Create logs directory if it doesn't exist
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+# Celery
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULE = {
+    'generate-upcoming-notifications-every-hour': {
+        'task': 'plants.tasks.generate_upcoming_notifications_task',
+        'schedule': crontab(minute=0),
+        'args': (2, 12),
+    },
+    'process-notifications-every-5-minutes': {
+        'task': 'plants.tasks.process_notifications_task',
+        'schedule': crontab(minute='*/5'),
+        'args': (100, 6),
+    },
+    'evaluate-automations-every-10-minutes': {
+        'task': 'plants.tasks.evaluate_automations_task',
+        'schedule': crontab(minute='*/10'),
+    },
+    'process-device-actions-every-5-minutes': {
+        'task': 'plants.tasks.process_device_actions_task',
+        'schedule': crontab(minute='*/5'),
+        'args': (100, 6),
+    },
+    'schedule-pest-followups-daily': {
+        'task': 'plants.tasks.schedule_pest_followups_task',
+        'schedule': crontab(minute=10, hour=6),
+        'args': (3,),
+    },
+}

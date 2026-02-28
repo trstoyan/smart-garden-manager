@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Devices</h1>
+      <p class="page-subtitle">Register sensor/actuator devices and open any device to edit keys and details.</p>
+    </div>
+    <span class="status-pill good">{{ devices|length }} device{{ devices|length|pluralize }}</span>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Add Device</div>
+    <div class="surface-body">
+      <form method="post">
+        {% csrf_token %}
+        {% include 'plants/_field_blocks.html' %}
+        <button class="btn btn-success" type="submit">Create Device</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">Registered Devices</div>
+    <div class="surface-body">
+      {% if devices %}
+      <div class="table-responsive">
+        <table class="table table-sm d-none d-md-table">
+          <thead>
+            <tr>
+              <th>Device ID</th>
+              <th>Garden</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for device in devices %}
+            <tr>
+              <td><a href="{% url 'plants:device_detail' device.id %}">{{ device.device_id }}</a></td>
+              <td>{{ device.garden.name }}</td>
+              <td>{{ device.description|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-md-none">
+        {% for device in devices %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <h6 class="mb-1"><a href="{% url 'plants:device_detail' device.id %}">{{ device.device_id }}</a></h6>
+            <div class="small text-muted">{{ device.garden.name }}</div>
+            <div class="small">{{ device.description|default:"No description" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h5>No devices yet</h5>
+        <p class="mb-2">Add your first device to start receiving sensor readings and automation actions.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

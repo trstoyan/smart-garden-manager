@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <section class="surface mb-3">
+    <div class="surface-body">
+      <div class="page-head mb-0">
+        <div>
+          <h1 class="page-title">Guided Start</h1>
+          <p class="page-subtitle">Step {{ step }} of {{ total_steps }}: {{ step_title }}</p>
+        </div>
+      </div>
+      <div class="mb-3 d-flex flex-wrap gap-2">
+        {% for label in step_labels %}
+        <span class="badge {% if forloop.counter == step %}bg-success{% elif forloop.counter < step %}bg-dark{% else %}bg-secondary{% endif %}">
+          {{ forloop.counter }}. {{ label }}
+        </span>
+        {% endfor %}
+      </div>
+      <div class="progress" role="progressbar" aria-label="Onboarding progress" aria-valuenow="{{ step }}" aria-valuemin="1" aria-valuemax="{{ total_steps }}">
+        <div class="progress-bar bg-success" style="width: {% widthratio step total_steps 100 %}%"></div>
+      </div>
+      <p class="text-muted mt-3 mb-0">{{ step_help }}</p>
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">Step {{ step }} Input</div>
+    <div class="surface-body">
+      <form method="post">
+        {% csrf_token %}
+
+        {% if step == 2 %}
+        <div class="note-strip mb-3">
+          <strong>Quick presets:</strong>
+          <button class="btn btn-sm btn-outline-success ms-2" type="button" onclick="applyTypePreset('herbs')">Herbs</button>
+          <button class="btn btn-sm btn-outline-success ms-1" type="button" onclick="applyTypePreset('house')">Houseplant</button>
+          <button class="btn btn-sm btn-outline-success ms-1" type="button" onclick="applyTypePreset('succulent')">Succulent</button>
+        </div>
+        {% endif %}
+
+        {% if step == 4 %}
+        <div class="note-strip mb-3">
+          <strong>Plant name ideas:</strong>
+          <button class="btn btn-sm btn-outline-success ms-2" type="button" onclick="fillPlantName('Basil')">Basil</button>
+          <button class="btn btn-sm btn-outline-success ms-1" type="button" onclick="fillPlantName('Monstera')">Monstera</button>
+          <button class="btn btn-sm btn-outline-success ms-1" type="button" onclick="fillPlantName('Rosemary')">Rosemary</button>
+        </div>
+        {% endif %}
+
+        {% include 'plants/_field_blocks.html' %}
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-success" type="submit">Save and Continue</button>
+          {% if show_skip %}
+          <button class="btn btn-outline-secondary" name="skip" value="1" type="submit">Skip and Finish</button>
+          {% endif %}
+          {% if step > 1 %}
+          <a class="btn btn-outline-dark" href="{% url 'plants:onboarding_wizard' %}?step={{ step|add:-1 }}">Back</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<script>
+  function applyTypePreset(kind) {
+    const name = document.getElementById('id_name');
+    const moisture = document.getElementById('id_moisture_preference');
+    const substrate = document.getElementById('id_default_substrate_type');
+    const water = document.getElementById('id_default_watering_interval_days');
+    const fert = document.getElementById('id_default_fertilization_interval_days');
+    const repot = document.getElementById('id_default_repotting_interval_days');
+    if (!name || !moisture || !substrate || !water || !fert || !repot) return;
+
+    if (kind === 'herbs') {
+      name.value = name.value || 'Herbs';
+      moisture.value = 'balanced';
+      substrate.value = 'soil';
+      water.value = 3;
+      fert.value = 21;
+      repot.value = 120;
+    } else if (kind === 'house') {
+      name.value = name.value || 'Houseplants';
+      moisture.value = 'balanced';
+      substrate.value = 'soil';
+      water.value = 7;
+      fert.value = 30;
+      repot.value = 180;
+    } else if (kind === 'succulent') {
+      name.value = name.value || 'Succulents';
+      moisture.value = 'dry';
+      substrate.value = 'mix';
+      water.value = 14;
+      fert.value = 45;
+      repot.value = 240;
+    }
+  }
+
+  function fillPlantName(value) {
+    const name = document.getElementById('id_name');
+    if (name && !name.value) {
+      name.value = value;
+    }
+  }
+</script>
+{% endblock %}

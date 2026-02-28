@@ -1,13 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-  <h2>Welcome to Smart Garden Manager! 🌱</h2>
-  <p>Use the navigation below to get started.</p>
-  <ul>
-    <li><a href="/plants/">🌿 Plants Dashboard</a></li>
-    <li><a href="/calendar/">📆 Care Calendar</a></li>
-    <li><a href="/devices/">🔌 Device Status</a></li>
-  </ul>
+<div class="container px-0">
+  <section class="surface mb-3">
+    <div class="surface-body">
+      <div class="page-head mb-0">
+        <div>
+          <h1 class="page-title">Run Your Garden With Less Guesswork</h1>
+          <p class="page-subtitle">Start with guided setup, then track care routines, automations, and alerts from one dashboard.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-success" href="{% url 'plants:onboarding_wizard' %}">Guided Start</a>
+          <a class="btn btn-outline-success" href="{% url 'plants:setup_center' %}">Setup Center</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Main Workflows</div>
+    <div class="surface-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="metric-card h-100">
+            <div class="metric-label">1. Setup</div>
+            <p class="mb-2">Create gardens, plant types, groups, and your first plants.</p>
+            <a href="{% url 'plants:setup_center' %}">Open setup</a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="metric-card h-100">
+            <div class="metric-label">2. Operate</div>
+            <p class="mb-2">Use calendar and operations dashboard to run daily care tasks.</p>
+            <a href="{% url 'plants:summary_dashboard' %}">Open operations</a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="metric-card h-100">
+            <div class="metric-label">3. Automate</div>
+            <p class="mb-2">Manage devices, sensor readings, actions, and notification queues.</p>
+            <a href="{% url 'plants:devices_center' %}">Open devices</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">Quick Access</div>
+    <div class="surface-body d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-dark" href="{% url 'plants:dashboard' %}">Plants</a>
+      <a class="btn btn-outline-dark" href="{% url 'plants:rules_center' %}">Rules</a>
+      <a class="btn btn-outline-dark" href="{% url 'plants:calendar' %}">Calendar</a>
+      <a class="btn btn-outline-dark" href="{% url 'plants:device_actions_center' %}">Actions</a>
+      <a class="btn btn-outline-dark" href="{% url 'plants:notifications_center' %}">Alerts</a>
+      <a class="btn btn-outline-secondary" href="{% url 'plants:ai_assistant_preview' %}">AI (Coming Soon)</a>
+    </div>
+  </section>
 </div>
 {% endblock %}

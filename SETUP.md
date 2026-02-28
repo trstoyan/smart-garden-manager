@@ -39,6 +39,13 @@ This guide will help you set up a virtual environment and install the required d
    pip install -r requirements.txt
    ```
 
+4. **Run migrations**:
+
+   ```bash
+   cd smart_garden
+   python manage.py migrate
+   ```
+
 ## Deactivating the Virtual Environment
 
 When you're done working on the project, you can deactivate the virtual environment:
@@ -64,3 +71,23 @@ If you need to add a new dependency to the project:
 ## Next Steps
 
 Once your environment is set up, refer to the CONTRIBUTING.md file for information on how to start the development server and contribute to the project.
+
+## Optional: Run Background Workers
+
+If you want periodic notification generation/dispatch in development:
+
+```bash
+# from smart_garden/
+celery -A smart_garden worker -l info
+celery -A smart_garden beat -l info
+```
+
+You can also run the automation/notification jobs manually:
+
+```bash
+python manage.py generate_upcoming_notifications --days 2 --daily-limit 12
+python manage.py process_notifications --batch-size 100 --max-attempts 6
+python manage.py evaluate_automations
+python manage.py process_device_actions --batch-size 100 --max-attempts 6
+python manage.py schedule_pest_followups --days 3
+```

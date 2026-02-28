@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Plants Dashboard</h1>
+      <p class="page-subtitle">Open any plant to edit details and care history.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-success btn-sm" href="{% url 'plants:plant_create' %}">Add Plant</a>
+      <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:calendar' %}">Care Calendar</a>
+    </div>
+  </div>
+
+  {% if plants %}
+  <section class="surface mb-3">
+    <div class="surface-header">All Plants</div>
+    <div class="surface-body">
+      <div class="table-responsive">
+        <table class="table table-striped d-none d-md-table">
+          <thead>
+            <tr>
+              <th>Plant</th>
+              <th>Garden</th>
+              <th>Location</th>
+              <th>Next Watering</th>
+              <th>Next Fertilization</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for plant in plants %}
+            <tr>
+              <td><a href="{% url 'plants:plant_detail' plant.id %}">{{ plant.name }}</a></td>
+              <td>{{ plant.group.garden.name }}</td>
+              <td>{{ plant.get_location_display }}</td>
+              <td>{{ plant.get_next_watering_date }}</td>
+              <td>{{ plant.get_next_fertilization_date }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-md-none">
+        {% for plant in plants %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <h6 class="mb-1"><a href="{% url 'plants:plant_detail' plant.id %}">{{ plant.name }}</a></h6>
+            <div class="small text-muted">{{ plant.group.garden.name }} · {{ plant.get_location_display }}</div>
+            <div class="small mt-1">Water: {{ plant.get_next_watering_date }}</div>
+            <div class="small">Fertilize: {{ plant.get_next_fertilization_date }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <section class="surface">
+    <div class="surface-body">
+      <div class="empty-state">
+        <h4>No plants yet</h4>
+        <p class="mb-2">Add your first plant record to unlock care scheduling and reminders.</p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-success btn-sm" href="{% url 'plants:plant_create' %}">Add First Plant</a>
+          <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:setup_center' %}">Open Setup Center</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

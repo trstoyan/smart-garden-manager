@@ -1,0 +1,9 @@
+{
+  "name": "Smart Garden Manager",
+  "short_name": "SmartGarden",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7eb",
+  "theme_color": "#2b5f3f",
+  "icons": []
+}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">{% if garden %}Edit Garden{% else %}Create Garden{% endif %}</h1>
+      <p class="page-subtitle">Gardens define environment settings and automation thresholds.</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'plants:setup_center' %}">Back to Setup</a>
+  </div>
+
+  <section class="surface">
+    <div class="surface-body">
+      <form method="post">
+        {% csrf_token %}
+        {% include 'plants/_field_blocks.html' %}
+        <button class="btn btn-success" type="submit">{% if garden %}Save Garden{% else %}Create Garden{% endif %}</button>
+      </form>
+
+      {% if garden %}
+      <hr>
+      <form method="post" action="{% url 'plants:garden_delete' garden.id %}" onsubmit="return confirm('Delete this garden?');">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger" type="submit">Delete Garden</button>
+      </form>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

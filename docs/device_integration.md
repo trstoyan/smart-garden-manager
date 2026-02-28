@@ -82,7 +82,34 @@ Payload:
 }
 ```
 
+Headers:
+
+```http
+X-Device-Key: <device_api_key>
+X-Idempotency-Key: <optional_unique_message_key>
+```
+
 Backend stores readings and logs them for dashboard and rule analysis.
+
+`device_api_key` is generated per device in Django admin (`Device.api_key`).
+
+### Trigger automation evaluation
+
+`POST /api/automation/evaluate/`
+
+This evaluates latest sensor readings and queues device actions (`water_pump_on`, `grow_light_on`, `ventilation_on`) when thresholds are crossed.
+
+### Dispatch queued actions
+
+`POST /api/device-actions/dispatch/`
+
+This executes pending actions through the configured adapter (`ACTUATOR_ADAPTER=log|webhook`). For webhook mode, set `ACTUATOR_WEBHOOK_URL`.
+
+### Pest workflow API
+
+- Create/manage profiles: `GET/POST /api/pest-profiles/`
+- Track incidents: `GET/POST /api/pest-incidents/`
+- Schedule follow-up reminders: `POST /api/pest/followups/schedule/`
 
 ---
 

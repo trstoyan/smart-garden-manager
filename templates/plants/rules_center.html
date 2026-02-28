@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Rules Center</h1>
+      <p class="page-subtitle">Set care rules for a plant or an entire group. Plant-level rules override group rules.</p>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:rule_coverage' %}">Coverage View</a>
+      <span class="status-pill good">{{ rules|length }} rule{{ rules|length|pluralize }}</span>
+    </div>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Create Rule</div>
+    <div class="surface-body">
+      <div class="note-strip mb-3">
+        Start simple: <strong>Name</strong>, <strong>Scope</strong>, target, and <strong>Water every (days)</strong>.
+      </div>
+
+      <div class="mb-3">
+        <div class="small text-muted mb-2">Quick templates</div>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-sm btn-outline-success" type="button" onclick="applyRulePreset('herbs')">Herbs</button>
+          <button class="btn btn-sm btn-outline-success" type="button" onclick="applyRulePreset('succulent')">Succulents</button>
+          <button class="btn btn-sm btn-outline-success" type="button" onclick="applyRulePreset('leafy')">Leafy Greens</button>
+          <button class="btn btn-sm btn-outline-success" type="button" onclick="applyRulePreset('tomato')">Tomatoes</button>
+        </div>
+      </div>
+
+      <form method="post" class="row g-3" id="rule-create-form">
+        {% csrf_token %}
+        <div class="col-md-3">
+          <label class="form-label" for="rule_name">Name</label>
+          <input class="form-control" id="rule_name" type="text" name="name" placeholder="Tomato hot-week rule">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="rule_scope">Scope</label>
+          <select class="form-select" id="rule_scope" name="scope" required>
+            <option value="">Select</option>
+            <option value="plant">Plant</option>
+            <option value="group">Group</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="rule_plant">Plant target</label>
+          <select class="form-select" id="rule_plant" name="plant_id">
+            <option value="">(none)</option>
+            {% for plant in plants %}
+            <option value="{{ plant.id }}">{{ plant.name }} ({{ plant.group.name }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="rule_group">Group target</label>
+          <select class="form-select" id="rule_group" name="group_id">
+            <option value="">(none)</option>
+            {% for group in groups %}
+            <option value="{{ group.id }}">{{ group.name }} ({{ group.garden.name }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-1">
+          <label class="form-label" for="rule_priority">Priority</label>
+          <input class="form-control" id="rule_priority" type="number" name="priority" min="1" max="1000" value="100">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label" for="rule_water">Water every (days)</label>
+          <input class="form-control" id="rule_water" type="number" name="watering_interval_days" min="1">
+        </div>
+
+        <div class="col-12">
+          <details>
+            <summary><strong>Advanced Rule Options</strong></summary>
+            <div class="row g-3 mt-1">
+              <div class="col-md-3">
+                <label class="form-label" for="rule_fertilize">Fertilize every (days)</label>
+                <input class="form-control" id="rule_fertilize" type="number" name="fertilization_interval_days" min="1">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="rule_repot">Repot every (days)</label>
+                <input class="form-control" id="rule_repot" type="number" name="repotting_interval_days" min="1">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="rule_wet">Wet threshold</label>
+                <input class="form-control" id="rule_wet" type="number" name="soil_moisture_wet_threshold" min="0">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="rule_dry">Dry threshold</label>
+                <input class="form-control" id="rule_dry" type="number" name="soil_moisture_dry_threshold" min="0">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="rule_pre_water">Pre-water before fertilize?</label>
+                <select class="form-select" id="rule_pre_water" name="requires_pre_watering">
+                  <option value="">Inherit</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="rule_pre_gap">Pre-water gap (days)</label>
+                <input class="form-control" id="rule_pre_gap" type="number" name="pre_fertilization_water_gap_days" min="0">
+              </div>
+              <div class="col-md-9">
+                <label class="form-label" for="rule_notes">Notes</label>
+                <input class="form-control" id="rule_notes" type="text" name="notes" placeholder="Example: Applies during seedling stage">
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-success" type="submit">Save Rule</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">Active Rule List</div>
+    <div class="surface-body">
+      {% if rules %}
+      <div class="table-responsive d-none d-md-block">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Target</th>
+              <th>Priority</th>
+              <th>Intervals</th>
+              <th>Moisture</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rule in rules %}
+            <tr>
+              <td><a href="{% url 'plants:rule_detail' rule.id %}">{{ rule.name }}</a></td>
+              <td>
+                {% if rule.scope == 'plant' %}
+                Plant: {{ rule.plant.name }}
+                {% else %}
+                Group: {{ rule.group.name }}
+                {% endif %}
+              </td>
+              <td>{{ rule.priority }}</td>
+              <td>
+                W {{ rule.watering_interval_days|default:"-" }} /
+                F {{ rule.fertilization_interval_days|default:"-" }} /
+                R {{ rule.repotting_interval_days|default:"-" }}
+              </td>
+              <td>
+                wet {{ rule.soil_moisture_wet_threshold|default:"-" }},
+                dry {{ rule.soil_moisture_dry_threshold|default:"-" }}
+              </td>
+              <td>
+                {% if rule.enabled %}
+                <span class="status-pill good">Enabled</span>
+                {% else %}
+                <span class="status-pill">Disabled</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="post" action="{% url 'plants:toggle_rule' rule.id %}">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-dark" type="submit">{% if rule.enabled %}Disable{% else %}Enable{% endif %}</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="d-md-none">
+        {% for rule in rules %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <h6 class="mb-1"><a href="{% url 'plants:rule_detail' rule.id %}">{{ rule.name }}</a></h6>
+              {% if rule.enabled %}
+              <span class="status-pill good">Enabled</span>
+              {% else %}
+              <span class="status-pill">Disabled</span>
+              {% endif %}
+            </div>
+            <div class="small text-muted mb-1">
+              {% if rule.scope == 'plant' %}
+              Plant: {{ rule.plant.name }}
+              {% else %}
+              Group: {{ rule.group.name }}
+              {% endif %}
+            </div>
+            <div class="small">Priority: {{ rule.priority }}</div>
+            <div class="small">W {{ rule.watering_interval_days|default:"-" }} · F {{ rule.fertilization_interval_days|default:"-" }} · R {{ rule.repotting_interval_days|default:"-" }}</div>
+            <form class="mt-2" method="post" action="{% url 'plants:toggle_rule' rule.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-dark" type="submit">{% if rule.enabled %}Disable{% else %}Enable{% endif %}</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h5>No rules yet</h5>
+        <p class="mb-0">Create your first rule above to control watering and feeding intervals by plant or group.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+<script>
+  function applyRulePreset(kind) {
+    const name = document.getElementById('rule_name');
+    const water = document.getElementById('rule_water');
+    const fert = document.getElementById('rule_fertilize');
+    const repot = document.getElementById('rule_repot');
+    const wet = document.getElementById('rule_wet');
+    const dry = document.getElementById('rule_dry');
+    const preWater = document.getElementById('rule_pre_water');
+    const preGap = document.getElementById('rule_pre_gap');
+    const notes = document.getElementById('rule_notes');
+
+    if (!name || !water || !fert || !repot || !wet || !dry || !preWater || !preGap || !notes) {
+      return;
+    }
+
+    if (kind === 'herbs') {
+      name.value = 'Herb standard care';
+      water.value = 3;
+      fert.value = 21;
+      repot.value = 120;
+      wet.value = 700;
+      dry.value = 430;
+      preWater.value = 'false';
+      preGap.value = 0;
+      notes.value = 'Frequent watering for active growth in containers.';
+      return;
+    }
+
+    if (kind === 'succulent') {
+      name.value = 'Succulent dry-cycle care';
+      water.value = 14;
+      fert.value = 45;
+      repot.value = 240;
+      wet.value = 520;
+      dry.value = 260;
+      preWater.value = 'false';
+      preGap.value = 0;
+      notes.value = 'Keep a wider dry cycle and avoid frequent feeding.';
+      return;
+    }
+
+    if (kind === 'leafy') {
+      name.value = 'Leafy green fast-cycle';
+      water.value = 2;
+      fert.value = 14;
+      repot.value = 90;
+      wet.value = 760;
+      dry.value = 470;
+      preWater.value = 'true';
+      preGap.value = 1;
+      notes.value = 'Supports rapid vegetative growth and shallow roots.';
+      return;
+    }
+
+    if (kind === 'tomato') {
+      name.value = 'Tomato fruiting rule';
+      water.value = 2;
+      fert.value = 10;
+      repot.value = 150;
+      wet.value = 760;
+      dry.value = 450;
+      preWater.value = 'true';
+      preGap.value = 1;
+      notes.value = 'Stable moisture during flowering and fruiting phase.';
+    }
+  }
+</script>
+{% endblock %}

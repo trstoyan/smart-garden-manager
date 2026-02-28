@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Notifications Center</h1>
+      <p class="page-subtitle">Process pending reminders and retry failed deliveries.</p>
+    </div>
+    <form class="d-flex gap-2" method="post" action="{% url 'plants:process_notifications' %}">
+      {% csrf_token %}
+      <input type="hidden" name="batch_size" value="100">
+      <input type="hidden" name="max_attempts" value="6">
+      <button class="btn btn-success btn-sm" type="submit">Process Queue</button>
+    </form>
+  </div>
+
+  <div class="mb-3 d-flex flex-wrap gap-2">
+    <a class="btn btn-sm {% if state == 'all' %}btn-dark{% else %}btn-outline-dark{% endif %}" href="{% url 'plants:notifications_center' %}?state=all">All ({{ pending_count|add:sent_count }})</a>
+    <a class="btn btn-sm {% if state == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}" href="{% url 'plants:notifications_center' %}?state=pending">Pending ({{ pending_count }})</a>
+    <a class="btn btn-sm {% if state == 'sent' %}btn-success{% else %}btn-outline-success{% endif %}" href="{% url 'plants:notifications_center' %}?state=sent">Sent ({{ sent_count }})</a>
+    <a class="btn btn-sm {% if state == 'failed' %}btn-danger{% else %}btn-outline-danger{% endif %}" href="{% url 'plants:notifications_center' %}?state=failed">Failed ({{ failed_count }})</a>
+  </div>
+
+  <section class="surface">
+    <div class="surface-header">Notification Queue</div>
+    <div class="surface-body">
+      {% if notifications %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle d-none d-md-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Plant</th>
+              <th>Event</th>
+              <th>Status</th>
+              <th>Attempts</th>
+              <th>Next Try</th>
+              <th>Error</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for notification in notifications %}
+            <tr>
+              <td>#{{ notification.id }}</td>
+              <td><a href="{% url 'plants:plant_detail' notification.plant.id %}">{{ notification.plant.name }}</a></td>
+              <td>{{ notification.event.event_type }} @ {{ notification.event.date }}</td>
+              <td>
+                {% if notification.sent %}
+                <span class="status-pill good">Sent</span>
+                {% elif notification.last_error %}
+                <span class="status-pill bad">Failed</span>
+                {% else %}
+                <span class="status-pill warn">Pending</span>
+                {% endif %}
+              </td>
+              <td>{{ notification.attempts }}</td>
+              <td>{{ notification.next_attempt_at|default:"-" }}</td>
+              <td><small>{{ notification.last_error|default:"-" }}</small></td>
+              <td>
+                <form method="post" action="{% url 'plants:retry_notification' notification.id %}">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-dark" type="submit">Retry</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-md-none">
+        {% for notification in notifications %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="small text-muted">#{{ notification.id }}</div>
+            <h6 class="mb-1"><a href="{% url 'plants:plant_detail' notification.plant.id %}">{{ notification.plant.name }}</a></h6>
+            <div class="small">{{ notification.event.event_type }} @ {{ notification.event.date }}</div>
+            <div class="small">Attempts: {{ notification.attempts }} · Next: {{ notification.next_attempt_at|default:"-" }}</div>
+            {% if notification.last_error %}<div class="small text-danger">{{ notification.last_error }}</div>{% endif %}
+            <form class="mt-2" method="post" action="{% url 'plants:retry_notification' notification.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-dark" type="submit">Retry</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h5>No notifications found</h5>
+        <p class="mb-0">You are clear for now. New reminders appear as tasks are scheduled.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

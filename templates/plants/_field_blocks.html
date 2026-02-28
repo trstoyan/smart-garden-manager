@@ -1,0 +1,40 @@
+{% if form.non_field_errors %}
+<div class="alert alert-danger">
+  {% for error in form.non_field_errors %}
+  <div>{{ error }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% for field in basic_fields %}
+<div class="mb-3">
+  <label class="form-label" for="{{ field.id_for_label }}">
+    {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+  </label>
+  {{ field }}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+  {% for error in field.errors %}
+  <div class="text-danger small">{{ error }}</div>
+  {% endfor %}
+</div>
+{% endfor %}
+
+{% if advanced_fields %}
+<details class="mb-3">
+  <summary><strong>Advanced Settings</strong></summary>
+  <div class="mt-3">
+    {% for field in advanced_fields %}
+    <div class="mb-3">
+      <label class="form-label" for="{{ field.id_for_label }}">
+        {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+      </label>
+      {{ field }}
+      {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+      {% for error in field.errors %}
+      <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</details>
+{% endif %}

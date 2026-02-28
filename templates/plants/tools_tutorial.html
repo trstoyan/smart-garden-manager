@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Tools Tutorial</h1>
+      <p class="page-subtitle">Use this checklist to run setup, daily care, and automation tools with confidence.</p>
+    </div>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">1. Daily Workflow (Web UI)</div>
+    <div class="surface-body">
+      <ol class="mb-0">
+        <li>Open <a href="{% url 'plants:onboarding_wizard' %}">Guided Start</a> for first-time setup.</li>
+        <li>Use <a href="{% url 'plants:setup_center' %}">Setup Center</a> to create gardens, plant types, and groups.</li>
+        <li>Open <a href="{% url 'plants:dashboard' %}">Plants</a> and add your plants.</li>
+        <li>Register hardware in <a href="{% url 'plants:devices_center' %}">Devices</a>.</li>
+        <li>Review telemetry in <a href="{% url 'plants:sensor_readings_center' %}">Sensor Readings</a>.</li>
+        <li>Open <a href="{% url 'plants:rules_center' %}">Rules Center</a> for group/plant care rules.</li>
+        <li>Open <a href="{% url 'plants:rule_coverage' %}">Rule Coverage</a> to find plants/groups missing active rules.</li>
+        <li>Plan and complete tasks from <a href="{% url 'plants:calendar' %}">Care Calendar</a>.</li>
+        <li>Run queue tools in <a href="{% url 'plants:device_actions_center' %}">Device Actions</a> and <a href="{% url 'plants:notifications_center' %}">Notifications Center</a>.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="surface mb-3">
+    <div class="surface-header">2. Device Data Ingest</div>
+    <div class="surface-body">
+      <p>Send readings to <code>POST /api/sensor-data/</code> with device key and optional idempotency key:</p>
+      <pre><code>curl -X POST http://localhost:8000/api/sensor-data/ \
+  -H "Content-Type: application/json" \
+  -H "X-Device-Key: &lt;device_api_key&gt;" \
+  -H "X-Idempotency-Key: reading-2026-02-27T23:00:00Z" \
+  -d '{"device_id":"ESP32_001","temperature":23.5,"humidity":52,"soil_moisture":480,"light":190}'</code></pre>
+    </div>
+  </section>
+
+  <section class="surface mb-3">
+    <div class="surface-header">3. Automation + Dispatch Commands</div>
+    <div class="surface-body">
+      <pre><code>cd smart_garden
+python manage.py evaluate_automations
+python manage.py process_device_actions --batch-size 100 --max-attempts 6</code></pre>
+    </div>
+  </section>
+
+  <section class="surface mb-3">
+    <div class="surface-header">4. Notification Commands</div>
+    <div class="surface-body">
+      <pre><code>cd smart_garden
+python manage.py generate_upcoming_notifications --days 2 --daily-limit 12
+python manage.py process_notifications --batch-size 100 --max-attempts 6</code></pre>
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">5. Pest Follow-up Scheduling</div>
+    <div class="surface-body">
+      <pre><code>cd smart_garden
+python manage.py schedule_pest_followups --days 3</code></pre>
+      <p class="mb-0">Integration details: <code>docs/device_integration.md</code></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

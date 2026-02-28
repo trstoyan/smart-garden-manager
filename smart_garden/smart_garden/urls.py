@@ -15,8 +15,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from rest_framework.permissions import AllowAny
+from rest_framework.schemas import get_schema_view
+
+from plants.views import home
+
+schema_view = get_schema_view(
+    title='Smart Garden Manager API',
+    description='Open API schema for Smart Garden Manager endpoints.',
+    version='1.0.0',
+    permission_classes=[AllowAny],
+)
 
 urlpatterns = [
+    path('', home, name='home'),
+    path('', include('plants.urls')),
+    path('api/schema/', schema_view, name='openapi-schema'),
     path('admin/', admin.site.urls),
 ]

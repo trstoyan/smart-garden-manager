@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Sensor Readings</h1>
+      <p class="page-subtitle">Review latest telemetry and filter by device.</p>
+    </div>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Filters</div>
+    <div class="surface-body">
+      <form class="row g-2" method="get">
+        <div class="col-md-4">
+          <label class="form-label" for="device_filter">Device</label>
+          <select class="form-select" id="device_filter" name="device">
+            <option value="">All devices</option>
+            {% for device in devices %}
+            <option value="{{ device.id }}" {% if selected_device == device.id|stringformat:"s" %}selected{% endif %}>{{ device.device_id }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2 align-self-end">
+          <button class="btn btn-success" type="submit">Apply Filter</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">Latest Readings</div>
+    <div class="surface-body">
+      {% if readings %}
+      <div class="table-responsive">
+        <table class="table table-sm d-none d-md-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Device</th>
+              <th>Temp (°C)</th>
+              <th>Humidity (%)</th>
+              <th>Soil</th>
+              <th>Light</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for reading in readings %}
+            <tr>
+              <td>{{ reading.timestamp }}</td>
+              <td><a href="{% url 'plants:device_detail' reading.device.id %}">{{ reading.device.device_id }}</a></td>
+              <td>{{ reading.temperature|default:"-" }}</td>
+              <td>{{ reading.humidity|default:"-" }}</td>
+              <td>{{ reading.soil_moisture|default:"-" }}</td>
+              <td>{{ reading.light|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-md-none">
+        {% for reading in readings %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="small text-muted">{{ reading.timestamp }}</div>
+            <h6 class="mb-1"><a href="{% url 'plants:device_detail' reading.device.id %}">{{ reading.device.device_id }}</a></h6>
+            <div class="small">Temp: {{ reading.temperature|default:"-" }} · Humidity: {{ reading.humidity|default:"-" }}</div>
+            <div class="small">Soil: {{ reading.soil_moisture|default:"-" }} · Light: {{ reading.light|default:"-" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h5>No sensor readings found</h5>
+        <p class="mb-0">Once devices send data, readings will appear here.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

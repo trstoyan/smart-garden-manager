@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">{% if plant %}Edit Plant{% else %}Create Plant{% endif %}</h1>
+      <p class="page-subtitle">Plant records drive your schedule, reminders, and status history.</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'plants:dashboard' %}">Back to Plants</a>
+  </div>
+
+  <section class="surface">
+    <div class="surface-body">
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+        {% include 'plants/_field_blocks.html' %}
+        <div class="col-12 d-flex flex-wrap gap-2">
+          <button class="btn btn-success" type="submit">{% if plant %}Save Changes{% else %}Create Plant{% endif %}</button>
+          {% if plant %}
+          <a class="btn btn-outline-primary" href="{% url 'plants:calendar' %}">Open Calendar</a>
+          {% endif %}
+        </div>
+      </form>
+
+      {% if plant %}
+      <hr>
+      <form method="post" action="{% url 'plants:plant_delete' plant.id %}" onsubmit="return confirm('Delete this plant?');">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger" type="submit">Delete Plant</button>
+      </form>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

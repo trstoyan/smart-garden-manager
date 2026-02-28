@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Device Actions</h1>
+      <p class="page-subtitle">Evaluate automation rules, process pending actions, and retry failures.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <form method="post" action="{% url 'plants:evaluate_automations' %}">
+        {% csrf_token %}
+        <button class="btn btn-warning btn-sm" type="submit">Evaluate Automations</button>
+      </form>
+      <form method="post" action="{% url 'plants:process_device_actions' %}">
+        {% csrf_token %}
+        <input type="hidden" name="batch_size" value="100">
+        <input type="hidden" name="max_attempts" value="6">
+        <button class="btn btn-success btn-sm" type="submit">Process Actions</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="mb-3 d-flex flex-wrap gap-2">
+    <a class="btn btn-sm {% if state == 'all' %}btn-dark{% else %}btn-outline-dark{% endif %}" href="{% url 'plants:device_actions_center' %}?state=all">All</a>
+    <a class="btn btn-sm {% if state == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}" href="{% url 'plants:device_actions_center' %}?state=pending">Pending ({{ pending_count }})</a>
+    <a class="btn btn-sm {% if state == 'executed' %}btn-success{% else %}btn-outline-success{% endif %}" href="{% url 'plants:device_actions_center' %}?state=executed">Executed ({{ executed_count }})</a>
+    <a class="btn btn-sm {% if state == 'failed' %}btn-danger{% else %}btn-outline-danger{% endif %}" href="{% url 'plants:device_actions_center' %}?state=failed">Failed ({{ failed_count }})</a>
+  </div>
+
+  <section class="surface">
+    <div class="surface-header">Action Queue</div>
+    <div class="surface-body">
+      {% if actions %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle d-none d-md-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Device</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Attempts</th>
+              <th>Reason</th>
+              <th>Next Try</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for action in actions %}
+            <tr>
+              <td>#{{ action.id }}</td>
+              <td><a href="{% url 'plants:device_detail' action.device.id %}">{{ action.device.device_id }}</a></td>
+              <td>{{ action.action_type }}</td>
+              <td>{{ action.status }}</td>
+              <td>{{ action.attempts }}</td>
+              <td>{{ action.reason|default:"-" }}</td>
+              <td>{{ action.next_attempt_at|default:"-" }}</td>
+              <td>
+                <form method="post" action="{% url 'plants:retry_device_action' action.id %}">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-dark" type="submit">Retry</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-md-none">
+        {% for action in actions %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="small text-muted">#{{ action.id }} · {{ action.status }}</div>
+            <h6 class="mb-1"><a href="{% url 'plants:device_detail' action.device.id %}">{{ action.device.device_id }}</a></h6>
+            <div class="small">{{ action.action_type }} · Attempts: {{ action.attempts }}</div>
+            <div class="small">{{ action.reason|default:"-" }}</div>
+            <form class="mt-2" method="post" action="{% url 'plants:retry_device_action' action.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-dark" type="submit">Retry</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h5>No actions found</h5>
+        <p class="mb-0">Run "Evaluate Automations" to generate actions from the latest sensor readings.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

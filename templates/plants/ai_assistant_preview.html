@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-0">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">AI Assistant</h1>
+      <p class="page-subtitle">A future assistant for personalized gardening guidance.</p>
+    </div>
+    <span class="status-pill warn">Coming Soon</span>
+  </div>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Planned Capabilities</div>
+    <div class="surface-body">
+      <ul class="mb-0">
+        <li>Personalized care recommendations by plant and season.</li>
+        <li>Sensor-aware issue triage for watering, heat, and humidity stress.</li>
+        <li>Natural-language Q&amp;A for troubleshooting and care planning.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">API Preview</div>
+    <div class="surface-body">
+      <p class="mb-0"><code>GET /api/ai/assistant/</code></p>
+    </div>
+  </section>
+</div>
+{% endblock %}
