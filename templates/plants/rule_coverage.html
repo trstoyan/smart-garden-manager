@@ -4,31 +4,31 @@
 <div class="container px-0">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Rule Coverage</h1>
-      <p class="page-subtitle">See which plants and groups are missing active rules so nothing is left unmanaged.</p>
+      <h1 class="page-title">Missing Care Plans</h1>
+      <p class="page-subtitle">See which plants and groups are missing active care plans so nothing is left unmanaged.</p>
     </div>
     <div class="d-flex gap-2">
-      <a class="btn btn-success btn-sm" href="{% url 'plants:rules_center' %}">Create Rules</a>
+      <a class="btn btn-success btn-sm" href="{% url 'plants:rules_center' %}">Create Care Plan</a>
       <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:setup_center' %}">Setup Center</a>
     </div>
   </div>
 
   <section class="surface mb-3">
-    <div class="surface-header">Coverage Summary</div>
+    <div class="surface-header">Care Plan Summary</div>
     <div class="surface-body">
       <div class="metric-grid">
         <div class="metric-card"><div class="metric-label">Plants Total</div><div class="metric-value">{{ total_plants }}</div></div>
         <div class="metric-card"><div class="metric-label">Plants Covered</div><div class="metric-value">{{ plants_covered }}</div></div>
         <div class="metric-card"><div class="metric-label">Plants Missing</div><div class="metric-value">{{ plants_missing }}</div></div>
-        <div class="metric-card"><div class="metric-label">By Plant Rule</div><div class="metric-value">{{ covered_by_plant_count }}</div></div>
-        <div class="metric-card"><div class="metric-label">By Group Rule</div><div class="metric-value">{{ covered_by_group_count }}</div></div>
-        <div class="metric-card"><div class="metric-label">Groups Missing Rule</div><div class="metric-value">{{ groups_without_rule }}</div></div>
+        <div class="metric-card"><div class="metric-label">By Plant Care Plan</div><div class="metric-value">{{ covered_by_plant_count }}</div></div>
+        <div class="metric-card"><div class="metric-label">By Group Care Plan</div><div class="metric-value">{{ covered_by_group_count }}</div></div>
+        <div class="metric-card"><div class="metric-label">Groups Missing Care Plan</div><div class="metric-value">{{ groups_without_rule }}</div></div>
       </div>
     </div>
   </section>
 
   <section class="surface mb-3">
-    <div class="surface-header">Plants Missing Coverage</div>
+    <div class="surface-header">Plants Missing Care Plans</div>
     <div class="surface-body">
       {% if missing_plants %}
       <div class="table-responsive d-none d-md-block">
@@ -47,7 +47,7 @@
               <td><a href="{% url 'plants:plant_detail' row.plant.id %}">{{ row.plant.name }}</a></td>
               <td><a href="{% url 'plants:plant_group_detail' row.plant.group.id %}">{{ row.plant.group.name }}</a></td>
               <td>{{ row.plant.group.garden.name }}</td>
-              <td><a class="btn btn-sm btn-outline-success" href="{% url 'plants:rules_center' %}">Add Rule</a></td>
+              <td><a class="btn btn-sm btn-outline-success" href="{% url 'plants:rules_center' %}">Add Care Plan</a></td>
             </tr>
             {% endfor %}
           </tbody>
@@ -59,7 +59,7 @@
           <div class="card-body">
             <h6 class="mb-1"><a href="{% url 'plants:plant_detail' row.plant.id %}">{{ row.plant.name }}</a></h6>
             <div class="small text-muted">{{ row.plant.group.name }} · {{ row.plant.group.garden.name }}</div>
-            <a class="btn btn-sm btn-outline-success mt-2" href="{% url 'plants:rules_center' %}">Add Rule</a>
+            <a class="btn btn-sm btn-outline-success mt-2" href="{% url 'plants:rules_center' %}">Add Care Plan</a>
           </div>
         </div>
         {% endfor %}
@@ -67,14 +67,14 @@
       {% else %}
       <div class="empty-state">
         <h5>All plants are covered</h5>
-        <p class="mb-0">Every plant has either a direct rule or a group-level rule.</p>
+        <p class="mb-0">Every plant has either a direct care plan or a group-level care plan.</p>
       </div>
       {% endif %}
     </div>
   </section>
 
   <section class="surface">
-    <div class="surface-header">Groups Missing Group Rules</div>
+    <div class="surface-header">Groups Missing Group Care Plans</div>
     <div class="surface-body">
       {% if groups_without_rule_list %}
       <ul class="list-lines mb-0">
@@ -84,14 +84,14 @@
             <a href="{% url 'plants:plant_group_detail' group.id %}">{{ group.name }}</a>
             <span class="text-muted">({{ group.garden.name }} · {{ group.plant_type.name }})</span>
           </div>
-          <a class="btn btn-sm btn-outline-success" href="{% url 'plants:rules_center' %}">Create Group Rule</a>
+          <a class="btn btn-sm btn-outline-success" href="{% url 'plants:rules_center' %}">Create Group Care Plan</a>
         </li>
         {% endfor %}
       </ul>
       {% else %}
       <div class="empty-state">
-        <h5>All groups have rules</h5>
-        <p class="mb-0">Great coverage. Keep this page as a periodic audit checkpoint.</p>
+        <h5>All groups have care plans</h5>
+        <p class="mb-0">Great consistency. Keep this page as a periodic care plan audit checkpoint.</p>
       </div>
       {% endif %}
     </div>

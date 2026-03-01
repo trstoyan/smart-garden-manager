@@ -4,36 +4,114 @@
 <div class="container px-0">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Operations Dashboard</h1>
-      <p class="page-subtitle">See garden workload and operational queues at a glance.</p>
+      <h1 class="page-title">Today</h1>
+      <p class="page-subtitle">What needs attention now, what is overdue, and what comes next.</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
       <a class="btn btn-success btn-sm" href="{% url 'plants:calendar' %}">Open Calendar</a>
-      <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:rules_center' %}">Manage Rules</a>
+      <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:rules_center' %}">Edit Care Plans</a>
     </div>
   </div>
 
   <section class="surface mb-3">
-    <div class="surface-header">Live Metrics</div>
+    <div class="surface-header">Garden Overview</div>
     <div class="surface-body">
       <div class="metric-grid">
-        <div class="metric-card"><div class="metric-label">Gardens</div><div class="metric-value">{{ garden_count }}</div></div>
+        <div class="metric-card"><div class="metric-label">Needs Attention Now</div><div class="metric-value">{{ todays_work|length }}</div></div>
+        <div class="metric-card"><div class="metric-label">Overdue Tasks</div><div class="metric-value">{{ overdue_count }}</div></div>
+        <div class="metric-card"><div class="metric-label">Pending Reminders</div><div class="metric-value">{{ pending_notifications }}</div></div>
+        <div class="metric-card"><div class="metric-label">Automation Tasks Pending</div><div class="metric-value">{{ pending_actions }}</div></div>
         <div class="metric-card"><div class="metric-label">Plants</div><div class="metric-value">{{ plant_count }}</div></div>
+        <div class="metric-card"><div class="metric-label">Gardens</div><div class="metric-value">{{ garden_count }}</div></div>
         <div class="metric-card"><div class="metric-label">Devices</div><div class="metric-value">{{ device_count }}</div></div>
-        <div class="metric-card"><div class="metric-label">Pending Alerts</div><div class="metric-value">{{ pending_notifications }}</div></div>
-        <div class="metric-card"><div class="metric-label">Pending Actions</div><div class="metric-value">{{ pending_actions }}</div></div>
         <div class="metric-card"><div class="metric-label">Open Incidents</div><div class="metric-value">{{ open_incidents }}</div></div>
-        <div class="metric-card"><div class="metric-label">Active Rules</div><div class="metric-value">{{ active_rules }}</div></div>
-        <div class="metric-card"><div class="metric-label">Overdue (7d)</div><div class="metric-value">{{ overdue_count }}</div></div>
       </div>
     </div>
   </section>
 
   <section class="surface mb-3">
-    <div class="surface-header">Top Event Types</div>
+    <div class="surface-header">Do These Now</div>
+    <div class="surface-body">
+      {% if todays_work %}
+      <div class="table-responsive d-none d-md-block">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Plant</th>
+              <th>Task</th>
+              <th>Garden</th>
+              <th>Due</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in todays_work %}
+            <tr>
+              <td>{{ task.plant_name }}</td>
+              <td>{{ task.event_type|title }}</td>
+              <td>{{ task.garden_name }}</td>
+              <td>{{ task.due_date }}</td>
+              <td>
+                {% if task.is_overdue %}
+                <span class="status-pill bad">Overdue</span>
+                {% else %}
+                <span class="status-pill warn">Due Today</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="d-md-none">
+        {% for task in todays_work %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <h6 class="mb-1">{{ task.plant_name }}</h6>
+            <div class="small text-muted">{{ task.garden_name }}</div>
+            <div class="small">{{ task.event_type|title }} · Due {{ task.due_date }}</div>
+            {% if task.is_overdue %}
+            <span class="status-pill bad">Overdue</span>
+            {% else %}
+            <span class="status-pill warn">Due Today</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h5>Nothing urgent right now</h5>
+        <p class="mb-2">You're clear for now. Check upcoming care tasks below.</p>
+        <a class="btn btn-sm btn-outline-success" href="{% url 'plants:calendar' %}">View Calendar</a>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="surface mb-3">
+    <div class="surface-header">Coming Up Next (7 days)</div>
+    <div class="surface-body">
+      {% if upcoming_next %}
+      <ul class="list-lines">
+        {% for task in upcoming_next %}
+        <li class="d-flex flex-wrap justify-content-between gap-2">
+          <span>{{ task.scheduled_date }} · {{ task.plant_name }} · {{ task.event_type|title }}</span>
+          <span class="status-pill">{{ task.garden_name }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="mb-0 text-muted">No additional scheduled tasks in the next 7 days.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="surface">
+    <div class="surface-header">Activity Trends</div>
     <div class="surface-body">
       {% if top_event_types %}
-      <ul class="list-lines">
+      <ul class="list-lines mb-0">
         {% for row in top_event_types %}
         <li class="d-flex justify-content-between">
           <span>{{ row.event_type|title }}</span>
@@ -42,19 +120,9 @@
         {% endfor %}
       </ul>
       {% else %}
-      <div class="empty-state">
-        <h5>No events yet</h5>
-        <p class="mb-2">As you complete care tasks, event trends will appear here.</p>
-        <a class="btn btn-sm btn-outline-success" href="{% url 'plants:calendar' %}">Go to Calendar</a>
-      </div>
+      <p class="mb-0 text-muted">Trends will appear after tasks are completed.</p>
       {% endif %}
     </div>
   </section>
-
-  <p class="helper-links mb-0">
-    Related tools: <a href="{% url 'plants:device_actions_center' %}">Device Actions</a> ·
-    <a href="{% url 'plants:notifications_center' %}">Notifications</a> ·
-    <a href="{% url 'plants:sensor_readings_center' %}">Sensor Readings</a>
-  </p>
 </div>
 {% endblock %}

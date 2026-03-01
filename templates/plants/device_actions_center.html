@@ -4,19 +4,19 @@
 <div class="container px-0">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Device Actions</h1>
-      <p class="page-subtitle">Evaluate automation rules, process pending actions, and retry failures.</p>
+      <h1 class="page-title">Automation Tasks</h1>
+      <p class="page-subtitle">Check automations, run pending tasks, and retry failures.</p>
     </div>
     <div class="d-flex gap-2">
       <form method="post" action="{% url 'plants:evaluate_automations' %}">
         {% csrf_token %}
-        <button class="btn btn-warning btn-sm" type="submit">Evaluate Automations</button>
+        <button class="btn btn-warning btn-sm" type="submit">Check Automation Tasks</button>
       </form>
       <form method="post" action="{% url 'plants:process_device_actions' %}">
         {% csrf_token %}
         <input type="hidden" name="batch_size" value="100">
         <input type="hidden" name="max_attempts" value="6">
-        <button class="btn btn-success btn-sm" type="submit">Process Actions</button>
+        <button class="btn btn-success btn-sm" type="submit">Run Pending Tasks</button>
       </form>
     </div>
   </div>
@@ -87,7 +87,7 @@
       {% else %}
       <div class="empty-state">
         <h5>No actions found</h5>
-        <p class="mb-0">Run "Evaluate Automations" to generate actions from the latest sensor readings.</p>
+        <p class="mb-0">Run "Check Automation Tasks" to generate tasks from the latest sensor readings.</p>
       </div>
       {% endif %}
     </div>

@@ -31,8 +31,8 @@
         <div class="col-md-4">
           <div class="metric-card h-100">
             <div class="metric-label">2. Operate</div>
-            <p class="mb-2">Use calendar and operations dashboard to run daily care tasks.</p>
-            <a href="{% url 'plants:summary_dashboard' %}">Open operations</a>
+            <p class="mb-2">Use Today and the calendar to run daily care tasks.</p>
+            <a href="{% url 'plants:summary_dashboard' %}">Open today</a>
           </div>
         </div>
         <div class="col-md-4">
@@ -50,9 +50,9 @@
     <div class="surface-header">Quick Access</div>
     <div class="surface-body d-flex flex-wrap gap-2">
       <a class="btn btn-outline-dark" href="{% url 'plants:dashboard' %}">Plants</a>
-      <a class="btn btn-outline-dark" href="{% url 'plants:rules_center' %}">Rules</a>
+      <a class="btn btn-outline-dark" href="{% url 'plants:rules_center' %}">Care Plans</a>
       <a class="btn btn-outline-dark" href="{% url 'plants:calendar' %}">Calendar</a>
-      <a class="btn btn-outline-dark" href="{% url 'plants:device_actions_center' %}">Actions</a>
+      <a class="btn btn-outline-dark" href="{% url 'plants:device_actions_center' %}">Automation Tasks</a>
       <a class="btn btn-outline-dark" href="{% url 'plants:notifications_center' %}">Alerts</a>
       <a class="btn btn-outline-secondary" href="{% url 'plants:ai_assistant_preview' %}">AI (Coming Soon)</a>
     </div>

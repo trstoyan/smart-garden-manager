@@ -4,17 +4,17 @@
 <div class="container px-0">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Rules Center</h1>
-      <p class="page-subtitle">Set care rules for a plant or an entire group. Plant-level rules override group rules.</p>
+      <h1 class="page-title">Care Plans</h1>
+      <p class="page-subtitle">Set care plans for a plant or an entire group. Plant-level plans override group plans.</p>
     </div>
     <div class="d-flex gap-2 align-items-center">
-      <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:rule_coverage' %}">Coverage View</a>
+      <a class="btn btn-outline-dark btn-sm" href="{% url 'plants:rule_coverage' %}">Missing Care Plans</a>
       <span class="status-pill good">{{ rules|length }} rule{{ rules|length|pluralize }}</span>
     </div>
   </div>
 
   <section class="surface mb-3">
-    <div class="surface-header">Create Rule</div>
+    <div class="surface-header">Create Care Plan</div>
     <div class="surface-body">
       <div class="note-strip mb-3">
         Start simple: <strong>Name</strong>, <strong>Scope</strong>, target, and <strong>Water every (days)</strong>.
@@ -74,7 +74,7 @@
 
         <div class="col-12">
           <details>
-            <summary><strong>Advanced Rule Options</strong></summary>
+            <summary><strong>Advanced Care Plan Options</strong></summary>
             <div class="row g-3 mt-1">
               <div class="col-md-3">
                 <label class="form-label" for="rule_fertilize">Fertilize every (days)</label>
@@ -113,14 +113,14 @@
         </div>
 
         <div class="col-12">
-          <button class="btn btn-success" type="submit">Save Rule</button>
+          <button class="btn btn-success" type="submit">Save Care Plan</button>
         </div>
       </form>
     </div>
   </section>
 
   <section class="surface">
-    <div class="surface-header">Active Rule List</div>
+    <div class="surface-header">Active Care Plans</div>
     <div class="surface-body">
       {% if rules %}
       <div class="table-responsive d-none d-md-block">
@@ -206,8 +206,8 @@
       </div>
       {% else %}
       <div class="empty-state">
-        <h5>No rules yet</h5>
-        <p class="mb-0">Create your first rule above to control watering and feeding intervals by plant or group.</p>
+        <h5>No care plans yet</h5>
+        <p class="mb-0">Create your first care plan above to control watering and feeding intervals by plant or group.</p>
       </div>
       {% endif %}
     </div>

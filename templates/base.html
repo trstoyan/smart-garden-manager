@@ -27,34 +27,35 @@
       {% with current=request.resolver_match.url_name|default:'' %}
       <nav class="nav-groups" aria-label="Primary">
         <div class="nav-group">
-          <span class="nav-group-label">Start</span>
-          <a class="nav-pill {% if current == 'home' %}is-active{% endif %}" href="{% url 'home' %}">Home</a>
-          <a class="nav-pill {% if current == 'onboarding_wizard' %}is-active{% endif %}" href="{% url 'plants:onboarding_wizard' %}">Guided Start</a>
-          <a class="nav-pill {% if current == 'tools_tutorial' %}is-active{% endif %}" href="{% url 'plants:tools_tutorial' %}">Tutorial</a>
+          <span class="nav-group-label">Daily</span>
+          <a class="nav-pill {% if current == 'summary_dashboard' %}is-active{% endif %}" href="{% url 'plants:summary_dashboard' %}">Today</a>
+          <a class="nav-pill {% if current == 'calendar' %}is-active{% endif %}" href="{% url 'plants:calendar' %}">Calendar</a>
+          <a class="nav-pill {% if current == 'dashboard' or current == 'plant_create' or current == 'plant_detail' %}is-active{% endif %}" href="{% url 'plants:dashboard' %}">My Plants</a>
+          <a class="nav-pill {% if current == 'rules_center' or current == 'rule_detail' %}is-active{% endif %}" href="{% url 'plants:rules_center' %}">Care Plans</a>
+          <a class="nav-pill {% if current == 'rule_coverage' %}is-active{% endif %}" href="{% url 'plants:rule_coverage' %}">Missing Care Plans</a>
         </div>
 
         <div class="nav-group">
           <span class="nav-group-label">Build</span>
+          <a class="nav-pill {% if current == 'home' %}is-active{% endif %}" href="{% url 'home' %}">Home</a>
+          <a class="nav-pill {% if current == 'onboarding_wizard' %}is-active{% endif %}" href="{% url 'plants:onboarding_wizard' %}">Guided Start</a>
           <a class="nav-pill {% if current == 'setup_center' or current == 'garden_create' or current == 'garden_detail' or current == 'plant_type_create' or current == 'plant_type_detail' or current == 'plant_group_create' or current == 'plant_group_detail' %}is-active{% endif %}" href="{% url 'plants:setup_center' %}">Setup</a>
-          <a class="nav-pill {% if current == 'dashboard' or current == 'plant_create' or current == 'plant_detail' %}is-active{% endif %}" href="{% url 'plants:dashboard' %}">Plants</a>
-          <a class="nav-pill {% if current == 'rules_center' or current == 'rule_detail' %}is-active{% endif %}" href="{% url 'plants:rules_center' %}">Rules</a>
-          <a class="nav-pill {% if current == 'rule_coverage' %}is-active{% endif %}" href="{% url 'plants:rule_coverage' %}">Coverage</a>
-        </div>
-
-        <div class="nav-group">
-          <span class="nav-group-label">Operate</span>
-          <a class="nav-pill {% if current == 'summary_dashboard' %}is-active{% endif %}" href="{% url 'plants:summary_dashboard' %}">Operations</a>
-          <a class="nav-pill {% if current == 'calendar' %}is-active{% endif %}" href="{% url 'plants:calendar' %}">Calendar</a>
           <a class="nav-pill {% if current == 'devices_center' or current == 'device_detail' %}is-active{% endif %}" href="{% url 'plants:devices_center' %}">Devices</a>
-          <a class="nav-pill {% if current == 'sensor_readings_center' %}is-active{% endif %}" href="{% url 'plants:sensor_readings_center' %}">Sensors</a>
-          <a class="nav-pill {% if current == 'device_actions_center' %}is-active{% endif %}" href="{% url 'plants:device_actions_center' %}">Actions</a>
-          <a class="nav-pill {% if current == 'notifications_center' %}is-active{% endif %}" href="{% url 'plants:notifications_center' %}">Alerts</a>
         </div>
 
         <div class="nav-group">
-          <span class="nav-group-label">Future</span>
-          <a class="nav-pill is-accent {% if current == 'ai_assistant_preview' %}is-active{% endif %}" href="{% url 'plants:ai_assistant_preview' %}">AI (Coming Soon)</a>
-          <a class="nav-pill {% if current == 'openapi-schema' %}is-active{% endif %}" href="{% url 'openapi-schema' %}">API Schema</a>
+          <span class="nav-group-label">More</span>
+          <details {% if current == 'notifications_center' or current == 'device_actions_center' or current == 'sensor_readings_center' or current == 'tools_tutorial' or current == 'ai_assistant_preview' or current == 'openapi-schema' %}open{% endif %}>
+            <summary>Advanced tools</summary>
+            <div class="mt-2 d-flex flex-column gap-2">
+              <a class="nav-pill {% if current == 'notifications_center' %}is-active{% endif %}" href="{% url 'plants:notifications_center' %}">Reminders</a>
+              <a class="nav-pill {% if current == 'device_actions_center' %}is-active{% endif %}" href="{% url 'plants:device_actions_center' %}">Automation Tasks</a>
+              <a class="nav-pill {% if current == 'sensor_readings_center' %}is-active{% endif %}" href="{% url 'plants:sensor_readings_center' %}">Sensor Readings</a>
+              <a class="nav-pill {% if current == 'tools_tutorial' %}is-active{% endif %}" href="{% url 'plants:tools_tutorial' %}">Tutorial</a>
+              <a class="nav-pill is-accent {% if current == 'ai_assistant_preview' %}is-active{% endif %}" href="{% url 'plants:ai_assistant_preview' %}">AI (Coming Soon)</a>
+              <a class="nav-pill {% if current == 'openapi-schema' %}is-active{% endif %}" href="{% url 'openapi-schema' %}">API Schema</a>
+            </div>
+          </details>
         </div>
       </nav>
       {% endwith %}
@@ -77,11 +78,11 @@
 
   {% with current=request.resolver_match.url_name|default:'' %}
   <nav class="mobile-dock" aria-label="Mobile quick links">
-    <a class="{% if current == 'home' %}is-active{% endif %}" href="{% url 'home' %}">Home</a>
+    <a class="{% if current == 'summary_dashboard' %}is-active{% endif %}" href="{% url 'plants:summary_dashboard' %}">Today</a>
+    <a class="{% if current == 'dashboard' or current == 'plant_create' or current == 'plant_detail' %}is-active{% endif %}" href="{% url 'plants:dashboard' %}">Plants</a>
+    <a class="{% if current == 'rules_center' or current == 'rule_detail' or current == 'rule_coverage' %}is-active{% endif %}" href="{% url 'plants:rules_center' %}">Plans</a>
     <a class="{% if current == 'setup_center' or current == 'garden_create' or current == 'garden_detail' or current == 'plant_type_create' or current == 'plant_type_detail' or current == 'plant_group_create' or current == 'plant_group_detail' %}is-active{% endif %}" href="{% url 'plants:setup_center' %}">Setup</a>
-    <a class="{% if current == 'calendar' %}is-active{% endif %}" href="{% url 'plants:calendar' %}">Calendar</a>
-    <a class="{% if current == 'rules_center' or current == 'rule_detail' or current == 'rule_coverage' %}is-active{% endif %}" href="{% url 'plants:rules_center' %}">Rules</a>
-    <a class="{% if current == 'summary_dashboard' %}is-active{% endif %}" href="{% url 'plants:summary_dashboard' %}">Ops</a>
+    <a class="{% if current == 'devices_center' or current == 'device_detail' %}is-active{% endif %}" href="{% url 'plants:devices_center' %}">Devices</a>
   </nav>
   {% endwith %}
 

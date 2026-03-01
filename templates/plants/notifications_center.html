@@ -4,14 +4,14 @@
 <div class="container px-0">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Notifications Center</h1>
-      <p class="page-subtitle">Process pending reminders and retry failed deliveries.</p>
+      <h1 class="page-title">Reminders</h1>
+      <p class="page-subtitle">Send pending reminders and retry failed deliveries.</p>
     </div>
     <form class="d-flex gap-2" method="post" action="{% url 'plants:process_notifications' %}">
       {% csrf_token %}
       <input type="hidden" name="batch_size" value="100">
       <input type="hidden" name="max_attempts" value="6">
-      <button class="btn btn-success btn-sm" type="submit">Process Queue</button>
+      <button class="btn btn-success btn-sm" type="submit">Send Reminders Now</button>
     </form>
   </div>
 
@@ -23,7 +23,7 @@
   </div>
 
   <section class="surface">
-    <div class="surface-header">Notification Queue</div>
+    <div class="surface-header">Reminder Queue</div>
     <div class="surface-body">
       {% if notifications %}
       <div class="table-responsive">

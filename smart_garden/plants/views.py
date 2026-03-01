@@ -758,6 +758,16 @@ def dashboard_view(request):
     planner = CareTaskPlanner(horizon_days=7, daily_limit=12)
     upcoming_tasks = planner.tasks_in_window()
     overdue = [task for task in upcoming_tasks if task.is_overdue]
+    today = timezone.now().date()
+
+    todays_work = [
+        task for task in upcoming_tasks
+        if task.scheduled_date <= today
+    ]
+    upcoming_next = [
+        task for task in upcoming_tasks
+        if task.scheduled_date > today
+    ]
 
     context = {
         'garden_count': Garden.objects.count(),
@@ -769,6 +779,8 @@ def dashboard_view(request):
         'active_rules': PlantCareRule.objects.filter(enabled=True).count(),
         'upcoming_count': len(upcoming_tasks),
         'overdue_count': len(overdue),
+        'todays_work': sorted(todays_work, key=lambda task: (not task.is_overdue, task.scheduled_date, task.event_type))[:12],
+        'upcoming_next': sorted(upcoming_next, key=lambda task: (task.scheduled_date, task.event_type))[:8],
         'top_event_types': (
             CalendarEvent.objects.values('event_type')
             .annotate(count=Count('id'))
