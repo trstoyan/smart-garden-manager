@@ -7,7 +7,7 @@
       <div class="page-head mb-0">
         <div>
           <h1 class="page-title">Run Your Garden With Less Guesswork</h1>
-          <p class="page-subtitle">Start with guided setup, then track care routines, automations, and alerts from one dashboard.</p>
+          <p class="page-subtitle">Start with guided setup, then track care routines, automations, and reminders from one dashboard.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
           <a class="btn btn-success" href="{% url 'plants:onboarding_wizard' %}">Guided Start</a>
@@ -38,7 +38,7 @@
         <div class="col-md-4">
           <div class="metric-card h-100">
             <div class="metric-label">3. Automate</div>
-            <p class="mb-2">Manage devices, sensor readings, actions, and notification queues.</p>
+            <p class="mb-2">Manage devices, sensor readings, automation tasks, and reminder queues.</p>
             <a href="{% url 'plants:devices_center' %}">Open devices</a>
           </div>
         </div>
@@ -53,7 +53,7 @@
       <a class="btn btn-outline-dark" href="{% url 'plants:rules_center' %}">Care Plans</a>
       <a class="btn btn-outline-dark" href="{% url 'plants:calendar' %}">Calendar</a>
       <a class="btn btn-outline-dark" href="{% url 'plants:device_actions_center' %}">Automation Tasks</a>
-      <a class="btn btn-outline-dark" href="{% url 'plants:notifications_center' %}">Alerts</a>
+      <a class="btn btn-outline-dark" href="{% url 'plants:notifications_center' %}">Reminders</a>
       <a class="btn btn-outline-secondary" href="{% url 'plants:ai_assistant_preview' %}">AI (Coming Soon)</a>
     </div>
   </section>

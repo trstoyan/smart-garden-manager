@@ -4,8 +4,8 @@
 <div class="container px-0">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Edit Rule</h1>
-      <p class="page-subtitle">Update intervals, thresholds, and targeting for this care rule.</p>
+      <h1 class="page-title">Edit Care Plan</h1>
+      <p class="page-subtitle">Update intervals, thresholds, and targeting for this care plan.</p>
     </div>
     <a class="btn btn-outline-secondary btn-sm" href="{% url 'plants:rules_center' %}">Back to Care Plans</a>
   </div>
@@ -15,13 +15,13 @@
       <form method="post">
         {% csrf_token %}
         {% include 'plants/_field_blocks.html' %}
-        <button class="btn btn-success" type="submit">Save Rule</button>
+        <button class="btn btn-success" type="submit">Save Care Plan</button>
       </form>
 
       <hr>
-      <form method="post" action="{% url 'plants:rule_delete' rule.id %}" onsubmit="return confirm('Delete this rule?');">
+      <form method="post" action="{% url 'plants:rule_delete' rule.id %}" onsubmit="return confirm('Delete this care plan?');">
         {% csrf_token %}
-        <button class="btn btn-outline-danger" type="submit">Delete Rule</button>
+        <button class="btn btn-outline-danger" type="submit">Delete Care Plan</button>
       </form>
     </div>
   </section>

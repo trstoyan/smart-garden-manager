@@ -13,6 +13,18 @@
     </div>
   </div>
 
+  {% if overdue_count > 0 or pending_notifications > 0 %}
+  <div class="note-strip mb-3">
+    {% if overdue_count > 0 %}
+    <strong>{{ overdue_count }}</strong> overdue task{{ overdue_count|pluralize }} need attention.
+    {% endif %}
+    {% if overdue_count > 0 and pending_notifications > 0 %} · {% endif %}
+    {% if pending_notifications > 0 %}
+    <strong>{{ pending_notifications }}</strong> reminder{{ pending_notifications|pluralize }} pending send.
+    {% endif %}
+  </div>
+  {% endif %}
+
   <section class="surface mb-3">
     <div class="surface-header">Garden Overview</div>
     <div class="surface-body">
