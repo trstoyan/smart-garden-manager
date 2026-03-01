@@ -7,12 +7,18 @@
       <h1 class="page-title">Reminders</h1>
       <p class="page-subtitle">Send pending reminders and retry failed deliveries.</p>
     </div>
-    <form class="d-flex gap-2" method="post" action="{% url 'plants:process_notifications' %}">
-      {% csrf_token %}
-      <input type="hidden" name="batch_size" value="100">
-      <input type="hidden" name="max_attempts" value="6">
-      <button class="btn btn-success btn-sm" type="submit">Send Reminders Now</button>
-    </form>
+    <div class="d-flex gap-2">
+      <form method="post" action="{% url 'plants:process_notifications' %}">
+        {% csrf_token %}
+        <input type="hidden" name="batch_size" value="100">
+        <input type="hidden" name="max_attempts" value="6">
+        <button class="btn btn-success btn-sm" type="submit">Send Reminders Now</button>
+      </form>
+      <form method="post" action="{% url 'plants:test_telegram_notification' %}">
+        {% csrf_token %}
+        <button class="btn btn-outline-primary btn-sm" type="submit">Send Telegram Test</button>
+      </form>
+    </div>
   </div>
 
   <div class="mb-3 d-flex flex-wrap gap-2">

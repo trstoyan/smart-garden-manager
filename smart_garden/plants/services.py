@@ -625,6 +625,12 @@ class NotificationDispatcher:
             raise RuntimeError(f'Webhook delivery returned status {status_code}')
 
     def _send_telegram(self, notification):
+        self._send_telegram_text(self._telegram_message(notification))
+
+    def send_telegram_test_message(self):
+        self._send_telegram_text('[Garden] ✅ Telegram channel test successful. Smart Garden reminders are connected.')
+
+    def _send_telegram_text(self, text):
         bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
         chat_id = os.getenv('TELEGRAM_CHAT_ID')
         if not bot_token:
@@ -634,7 +640,7 @@ class NotificationDispatcher:
 
         payload = {
             'chat_id': chat_id,
-            'text': self._telegram_message(notification),
+            'text': text,
             'disable_web_page_preview': True,
         }
         data = json.dumps(payload).encode('utf-8')

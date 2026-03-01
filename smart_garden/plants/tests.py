@@ -545,6 +545,21 @@ class WebOperationsFlowTests(TestCase):
         self.assertFalse(notification.sent)
         self.assertIsNotNone(notification.next_attempt_at)
 
+    def test_notifications_send_telegram_test(self):
+        with mock.patch('plants.views.NotificationDispatcher.send_telegram_test_message') as mocked_sender:
+            response = self.client.post(reverse('plants:test_telegram_notification'))
+        self.assertEqual(response.status_code, 302)
+        mocked_sender.assert_called_once_with()
+
+    def test_notifications_send_telegram_test_error(self):
+        with mock.patch(
+            'plants.views.NotificationDispatcher.send_telegram_test_message',
+            side_effect=RuntimeError('invalid token'),
+        ) as mocked_sender:
+            response = self.client.post(reverse('plants:test_telegram_notification'))
+        self.assertEqual(response.status_code, 302)
+        mocked_sender.assert_called_once_with()
+
     def test_device_actions_evaluate_process_and_retry(self):
         device = Device.objects.create(device_id='ops-action-dev', garden=self.garden)
         SensorReading.objects.create(device=device, soil_moisture=300, light=90, humidity=85.0)

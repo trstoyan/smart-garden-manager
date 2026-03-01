@@ -640,6 +640,17 @@ def process_notifications_view(request):
 
 
 @require_POST
+def test_telegram_notification_view(request):
+    try:
+        NotificationDispatcher().send_telegram_test_message()
+    except Exception as exc:
+        messages.error(request, f'Telegram test failed: {exc}')
+    else:
+        messages.success(request, 'Telegram test reminder sent successfully.')
+    return redirect('plants:notifications_center')
+
+
+@require_POST
 def retry_notification_view(request, notification_id):
     notification = get_object_or_404(Notification, pk=notification_id)
     notification.sent = False

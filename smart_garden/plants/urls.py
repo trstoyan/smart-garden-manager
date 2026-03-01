@@ -30,6 +30,7 @@ urlpatterns = [
     path('sensor-readings/', views.sensor_readings_center_view, name='sensor_readings_center'),
     path('notifications/', views.notifications_center_view, name='notifications_center'),
     path('notifications/process/', views.process_notifications_view, name='process_notifications'),
+    path('notifications/test-telegram/', views.test_telegram_notification_view, name='test_telegram_notification'),
     path('notifications/<int:notification_id>/retry/', views.retry_notification_view, name='retry_notification'),
     path('device-actions/', views.device_actions_center_view, name='device_actions_center'),
     path('device-actions/process/', views.process_device_actions_view, name='process_device_actions'),
