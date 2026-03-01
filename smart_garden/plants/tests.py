@@ -687,6 +687,44 @@ class NotificationPipelineTests(TestCase):
         self.assertIn('provider down', self.notification.last_error)
         self.assertIsNotNone(self.notification.next_attempt_at)
 
+    def test_telegram_channel_requires_credentials(self):
+        with mock.patch.dict('os.environ', {'NOTIFICATION_CHANNELS': 'telegram'}, clear=False):
+            dispatcher = NotificationDispatcher(max_attempts=3)
+            result = dispatcher.dispatch_pending(batch_size=10)
+
+        self.notification.refresh_from_db()
+        self.assertEqual(result['failed'], 1)
+        self.assertIn('TELEGRAM_BOT_TOKEN', self.notification.last_error)
+        self.assertEqual(self.notification.attempts, 1)
+
+    def test_telegram_channel_success_marks_sent(self):
+        response = mock.MagicMock()
+        response.getcode.return_value = 200
+        response.read.return_value = b'{"ok": true, "result": {"message_id": 123}}'
+
+        cm = mock.MagicMock()
+        cm.__enter__.return_value = response
+        cm.__exit__.return_value = False
+
+        with mock.patch.dict(
+            'os.environ',
+            {
+                'NOTIFICATION_CHANNELS': 'telegram',
+                'TELEGRAM_BOT_TOKEN': 'test-token',
+                'TELEGRAM_CHAT_ID': '123456',
+            },
+            clear=False,
+        ), mock.patch('plants.services.urlrequest.urlopen', return_value=cm) as mocked_urlopen:
+            dispatcher = NotificationDispatcher(max_attempts=3)
+            result = dispatcher.dispatch_pending(batch_size=10)
+
+        self.notification.refresh_from_db()
+        self.assertEqual(result['sent'], 1)
+        self.assertTrue(self.notification.sent)
+        self.assertEqual(mocked_urlopen.call_count, 1)
+        request = mocked_urlopen.call_args[0][0]
+        self.assertIn('/sendMessage', request.full_url)
+
     def test_generate_upcoming_notifications_is_idempotent(self):
         self.plant.last_watered = timezone.now().date() - timezone.timedelta(days=7)
         self.plant.last_fertilized = timezone.now().date() - timezone.timedelta(days=30)

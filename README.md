@@ -54,7 +54,7 @@
 ### 🔜 Upcoming Features (v0.2+)
 - [x] Dynamic water preparation rules by plant/group/type.
 - [x] Fertilization and repotting calendar integration.
-- [x] Notifications (email/webhook-ready pipeline) for upcoming tasks.
+- [x] Notifications (log/email/webhook/Telegram-ready pipeline) for upcoming tasks.
 - [x] Load balancing of plant care tasks across days.
 - [x] Plant status tracking (e.g., flowering, dormancy, pest incidents).
 - [x] Environmental data logging via connected devices (ESP32/RPi).
@@ -84,6 +84,10 @@
   - `cd smart_garden && python manage.py generate_upcoming_notifications --days 2 --daily-limit 12`
 - Process pending notifications with retry/backoff:
   - `cd smart_garden && python manage.py process_notifications --batch-size 100 --max-attempts 6`
+- Optional Telegram delivery channel:
+  - `NOTIFICATION_CHANNELS=telegram`
+  - `TELEGRAM_BOT_TOKEN=<your_bot_token>`
+  - `TELEGRAM_CHAT_ID=<target_chat_id>`
 - Evaluate device automations from latest readings:
   - `cd smart_garden && python manage.py evaluate_automations`
 - Process queued device actions with retry/backoff:

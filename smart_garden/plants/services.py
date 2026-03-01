@@ -558,6 +558,8 @@ class NotificationDispatcher:
                 self._send_email(notification)
             elif channel == 'webhook':
                 self._send_webhook(notification)
+            elif channel == 'telegram':
+                self._send_telegram(notification)
             else:
                 raise ValueError(f'Unsupported notification channel: {channel}')
 
@@ -621,6 +623,54 @@ class NotificationDispatcher:
 
         if status_code >= 400:
             raise RuntimeError(f'Webhook delivery returned status {status_code}')
+
+    def _send_telegram(self, notification):
+        bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+        chat_id = os.getenv('TELEGRAM_CHAT_ID')
+        if not bot_token:
+            raise RuntimeError('TELEGRAM_BOT_TOKEN is required for telegram channel')
+        if not chat_id:
+            raise RuntimeError('TELEGRAM_CHAT_ID is required for telegram channel')
+
+        payload = {
+            'chat_id': chat_id,
+            'text': self._telegram_message(notification),
+            'disable_web_page_preview': True,
+        }
+        data = json.dumps(payload).encode('utf-8')
+        req = urlrequest.Request(
+            f'https://api.telegram.org/bot{bot_token}/sendMessage',
+            data=data,
+            headers={'Content-Type': 'application/json'},
+            method='POST',
+        )
+
+        try:
+            with urlrequest.urlopen(req, timeout=10) as resp:
+                status_code = resp.getcode()
+                body = resp.read().decode('utf-8', errors='replace')
+        except urlerror.URLError as exc:
+            raise RuntimeError(f'Telegram delivery failed: {exc}') from exc
+
+        if status_code >= 400:
+            raise RuntimeError(f'Telegram delivery returned status {status_code}')
+
+        if body:
+            try:
+                parsed = json.loads(body)
+            except json.JSONDecodeError:
+                parsed = {}
+            if isinstance(parsed, dict) and parsed.get('ok') is False:
+                description = parsed.get('description', 'unknown error')
+                raise RuntimeError(f'Telegram delivery failed: {description}')
+
+    def _telegram_message(self, notification):
+        notes = notification.event.notes or 'N/A'
+        return (
+            f"[Garden] {notification.event.event_type.title()} due for {notification.plant.name}\\n"
+            f"Date: {notification.event.date.isoformat()}\\n"
+            f"Notes: {notes}"
+        )
 
     def _backoff_minutes(self, attempts):
         index = max(0, attempts - 1)
